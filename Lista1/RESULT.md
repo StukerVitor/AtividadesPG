@@ -33,9 +33,12 @@ Na OpenGL, os vértices são geralmente armazenados usando Vertex Buffer Objects
 
 a. **Apenas com o polígono preenchido**
 ![Apenas com o polígono preenchido - Vitor](/Lista1/Lista1_5_Triangulo/Prints/5_a.png)
+
 b. **Apenas com contorno**  
 ![Apenas com contorno - Vitor](/Lista1/Lista1_5_Triangulo/Prints/5_b.png)
+
 c. **Apenas como pontos**  
 ![Apenas como pontos - Vitor](/Lista1/Lista1_5_Triangulo/Prints/5_c.png)
+
 d. **Com as 3 formas de desenho juntas**
 ![Com as 3 formas de desenho juntas - Vitor](/Lista1/Lista1_5_Triangulo/Prints/5_d.png)
