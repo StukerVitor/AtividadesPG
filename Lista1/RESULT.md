@@ -42,3 +42,77 @@ c. **Apenas como pontos**
 
 d. **Com as 3 formas de desenho juntas**
 ![Com as 3 formas de desenho juntas - Vitor](/Lista1/Lista1_5_Triangulo/Prints/5_d.png)
+
+## 6. Faça o desenho de um círculo na tela
+
+Utilize a equação paramétrica do círculo para gerar os vértices. Depois disso:
+
+a. **Desenhe um octágono**  
+![Octágono - Vitor](/Lista1/Lista1_6_Circulo/Prints/6_a.png)
+
+b. **Desenhe um pentágono**
+![Pentágono - Vitor](/Lista1/Lista1_6_Circulo/Prints/6_b.png)
+
+c. **Desenhe um pac-man!**
+![Pac-man - Vitor](/Lista1/Lista1_6_Circulo/Prints/6_c.png)
+
+d. **Desenhe uma fatia de pizza**
+![Pizza - Vitor](/Lista1/Lista1_6_Circulo/Prints/6_d.png)
+
+## 7. Desenhe uma espiral:
+
+![Espiral - Vitor](/Lista1/Lista1_7_Espiral/Prints/7.png)
+
+## 8. Considerando o seguinte triângulo abaixo, formado pelos vértices P1, P2 e P3, respectivamente com as cores vermelho, verde e azul.
+
+a. **Descreva uma possível configuração dos buffers (VBO, VAO e EBO) para representá-lo.**
+
+1. **VBO (Vertex Buffer Object):**
+
+   - Armazena os dados dos vértices do triângulo, incluindo posições e cores. Exemplo de dados no VBO:
+     ```cpp
+     GLfloat vertices[] = {
+       0.0,  0.6, 0.0, 1.0, 0.0, 0.0,  // v0 - posição (0.0, 0.6, 0.0), cor (1.0, 0.0, 0.0)
+      -0.6, -0.5, 0.0, 0.0, 1.0, 0.0,  // v1 - posição (-0.6, -0.5, 0.0), cor (0.0, 1.0, 0.0)
+       0.6, -0.3, 0.0, 0.0, 0.0, 1.0   // v2 - posição (0.6, -0.3, 0.0), cor (0.0, 0.0, 1.0)
+     };
+     ```
+
+2. **VAO (Vertex Array Object):**
+
+   - Armazena os ponteiros para os atributos dos vértices. Exemplo de configuração:
+
+   ```cpp
+        glGenVertexArrays(1, &VAO);
+        glBindVertexArray(VAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);   // Atributo posição
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));  // Atributo cor
+        glEnableVertexAttribArray(1);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+   ```
+
+3. **EBO (Element Buffer Object):**
+   - Não é necessário neste caso, já que o triângulo é desenhado com `glDrawArrays()` e os vértices estão organizados em ordem.
+
+b. **Como estes atributos seriam identificados no vertex shader?**
+
+1. **Posição (location = 0):**
+
+   - Associado ao atributo `position` no shader:
+     ```glsl
+     layout (location = 0) in vec3 position;
+     ```
+
+2. **Cor (location = 1):**
+   - Associado ao atributo `color` no shader:
+     ```glsl
+     layout (location = 1) in vec3 color;
+     ```
+
+![Triângulo - Vitor](/Lista1/Lista1_8_Triangulo/Prints/8.png)

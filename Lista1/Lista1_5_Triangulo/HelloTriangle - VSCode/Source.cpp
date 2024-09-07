@@ -99,23 +99,12 @@ int main()
 		// Cor do desenho do contorno e pontos
 		glUniform4f(colorLoc, 0.0f, 0.0f, 1.0f, 1.0f); // Cor azul
 
-		// Contorno
-		// Define o modo de desenho dos polígonos como linhas.
-		// Isso significa que os triângulos serão desenhados apenas com as linhas
-		// que formam seus contornos, e não preenchidos.
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		// Desenha todos os 6 vértices (os dois triângulos) no modo de linhas.
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		// 2 - Polígono com contorno
+		glDrawArrays(GL_LINE_LOOP, 0, 3);
+		glDrawArrays(GL_LINE_LOOP, 3, 3);
 
-		// Pontos
-		// Define o modo de desenho dos polígonos como pontos.
-		// Isso significa que os triângulos serão desenhados apenas como pontos
-		// individuais nos vértices.
-		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-
-		// Restabelecendo modo de preenchimento
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		// 3 - Apenas os vértices dos polígonos
+		glDrawArrays(GL_POINTS, 0, 6);
 
 		glBindVertexArray(0); // Desconectando o buffer de geometria
 
@@ -190,15 +179,15 @@ int setupGeometry()
 {
 	// Aqui setamos as coordenadas x, y e z
 	GLfloat vertices[] = {
-		// x   y     z    r   g    b
+		// x   y   z
 		// Triângulo 0
-		-0.5, 0.5, 0.0, 1.0, 0.0, 0.0,	// v0
-		0.0, 0.0, 0.0, 0.0, 1.0, 0.0,	// v1
-		0.5, 0.5, 0.0, 0.0, 0.0, 1.0,	// v2
-										// Triângulo 1
-		0.0, 0.0, 0.0, 1.0, 1.0, 0.0,	// v3
-		-0.5, -0.5, 0.0, 0.0, 1.0, 1.0, // v4
-		0.5, -0.5, 0.0, 1.0, 0.0, 1.0,	// v5
+		-0.5, 0.5, 0.0, // v0
+		0.0, 0.0, 0.0,	// v1
+		0.5, 0.5, 0.0,	// v2
+		// Triângulo 1
+		0.0, 0.0, 0.0,	 // v3
+		-0.5, -0.5, 0.0, // v4
+		0.5, -0.5, 0.0,	 // v5
 	};
 
 	GLuint VBO, VAO;
@@ -222,9 +211,7 @@ int setupGeometry()
 	//  Se está normalizado (entre zero e um)
 	//  Tamanho em bytes
 	//  Deslocamento a partir do byte zero
-
-	// Atributo 0 - posição
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid *)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
 	glEnableVertexAttribArray(0);
 
 	// Observe que isso é permitido, a chamada para glVertexAttribPointer registrou o VBO como o objeto de buffer de vértice
