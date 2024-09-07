@@ -100,8 +100,8 @@ int main()
 		glBindVertexArray(VAO); // Conectando ao buffer de geometria
 
 		glUniform4f(colorLoc, 0.0f, 0.0f, 1.0f, 1.0f); // Cor azul
-		// glDrawArrays(GL_TRIANGLE_FAN, 0, nVertices);   // Código para Círculo, Octógono, Pentágono, Pac-man
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 6); // Código para Fatia de pizza
+		glDrawArrays(GL_TRIANGLE_FAN, 0, nVertices);   // Código para Círculo, Octógono, Pentágono, Pac-man
+		// glDrawArrays(GL_TRIANGLE_FAN, 0, 6); // Código para Fatia de pizza
 
 		glBindVertexArray(0); // Desconectando o buffer de geometria
 

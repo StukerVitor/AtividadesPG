@@ -46,6 +46,7 @@ d. **Com as 3 formas de desenho juntas**
 ## 6. Faça o desenho de um círculo na tela
 
 Utilize a equação paramétrica do círculo para gerar os vértices. Depois disso:
+![Círculo - Vitor](/Lista1/Lista1_6_Circulo/Prints/6.png)
 
 a. **Desenhe um octágono**  
 ![Octágono - Vitor](/Lista1/Lista1_6_Circulo/Prints/6_a.png)
