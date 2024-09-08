@@ -117,3 +117,7 @@ b. **Como estes atributos seriam identificados no vertex shader?**
      ```
 
 ![Triângulo - Vitor](/Lista1/Lista1_8_Triangulo/Prints/8.png)
+
+## 9. Faça um desenho em um papel quadriculado (pode ser no computador mesmo) e reproduza-o utilizando primitivas em OpenGL. Neste exercício você poderá criar mais de um VAO e fazer mais de uma chamada de desenho para poder utilizar primitivas diferentes, se necessário.
+
+![Casa - Vitor](/Lista1/Lista1_9_Casa/Prints/9.png)
