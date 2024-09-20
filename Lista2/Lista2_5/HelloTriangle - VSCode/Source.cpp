@@ -103,6 +103,7 @@ int main()
 
 		// Resolução de parte do exercicio 5 lista 2
 		// Primeira viewport (quadrante inferior esquerdo)
+		// x, y, width, height
 		glViewport(0, 0, width / 2, height / 2); // unidades de tela: pixel
 		drawScene(VAO, colorLoc);
 
