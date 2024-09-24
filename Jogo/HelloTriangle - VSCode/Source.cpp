@@ -3,8 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <assert.h>
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#define STB_IMAGE_IMPLEMENTATION
 
 // GLAD
 #include <glad/glad.h>
@@ -43,8 +43,8 @@ Sprite exitButton;
 Sprite placar;
 Sprite placarZero;
 int gmOver = 0;	   // Variável para impedir movimentos após game over
-int pontos = 0;	   // Variável para contar quantidade de maçãs coletadas e encerrar execução
-int quantPont = 3; // Variável para limitar a quantidade de poções a serem coletadas, valor de 1 - 3
+int pontos = 0;	   // Variável para contar quantidade de cenouras coletadas e encerrar execução
+int quantPont = 3; // Variável para limitar a quantidade de cenouras a serem coletadas, valor de 1 - 3
 int gameState = 0; // 0: Menu, 1: Jogando, 2: Game Over, 3: Vitória
 bool win = false;
 
