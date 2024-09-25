@@ -3,8 +3,10 @@
 #include <fstream>
 #include <sstream>
 #include <assert.h>
-#include <stb_image.h>
+
 #define STB_IMAGE_IMPLEMENTATION
+
+#include <stb_image.h>
 
 // GLAD
 #include <glad/glad.h>
@@ -50,7 +52,7 @@ bool win = false;
 
 // Vertex Shader source code
 const GLchar *vertexShaderSource = R"glsl(
-    #version 330 core
+    #version 400 core
     layout(location = 0) in vec3 aPos;     // Vertex position
     layout(location = 1) in vec3 aColor;   // Vertex color
     layout(location = 2) in vec2 aTexCoord; // Texture coordinate
@@ -71,7 +73,7 @@ const GLchar *vertexShaderSource = R"glsl(
 
 // Fragment Shader source code
 const GLchar *fragmentShaderSource = R"glsl(
-    #version 330 core
+    #version 400 core
     out vec4 FragColor;
 
     in vec3 ourColor;
@@ -469,6 +471,7 @@ GLuint loadTexture(string texturePath)
 	int width, height, nrChannels;
 	unsigned char *data = stbi_load(texturePath.c_str(), &width, &height, &nrChannels, 0);
 
+	// Carregamento da imagem da texture
 	if (data)
 	{
 		if (nrChannels == 3) // jpg, bmp
