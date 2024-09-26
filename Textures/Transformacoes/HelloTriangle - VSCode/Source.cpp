@@ -1,0 +1,303 @@
+#include <iostream>
+#include <string>
+#include <assert.h>
+
+using namespace std;
+
+// GLAD
+#include <glad/glad.h>
+
+// GLFW
+#include <GLFW/glfw3.h>
+
+// GLM
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+// STB_IMAGE
+#include <stb_image.h>
+
+using namespace glm;
+
+// Protótipos das funções
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
+int setupShader();
+int setupGeometry();
+int loadTexture(string filePath, int &imgWidth, int &imgHeight);
+
+// Dimensões da janela (pode ser alterado em tempo de execução)
+const GLuint WIDTH = 800,
+			 HEIGHT = 600;
+
+// Código fonte do Vertex Shader (em GLSL): ainda hardcoded
+const GLchar *vertexShaderSource = "#version 400\n"
+								   "layout (location = 0) in vec3 position;\n"
+								   "uniform mat4 projection;\n"
+								   "uniform mat4 model;\n"
+								   "void main()\n"
+								   "{\n"
+								   //...pode ter mais linhas de código aqui!
+								   "gl_Position = projection * model * vec4(position.x, position.y, position.z, 1.0);\n"
+								   "}\0";
+
+// Códifo fonte do Fragment Shader (em GLSL): ainda hardcoded
+const GLchar *fragmentShaderSource = "#version 400\n"
+									 "uniform vec4 inputColor;\n"
+									 "out vec4 color;\n"
+									 "void main()\n"
+									 "{\n"
+									 "color = inputColor;\n"
+									 "}\n\0";
+
+// Função MAIN
+int main()
+{
+	// Inicialização da GLFW
+	glfwInit();
+
+	// Criação da janela GLFW
+	GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "Exercicio 1 - Vitor Stuker", nullptr, nullptr);
+	glfwMakeContextCurrent(window);
+
+	// Fazendo o registro da função de callback para a janela GLFW
+	glfwSetKeyCallback(window, key_callback);
+
+	// GLAD: carrega todos os ponteiros de funções da OpenGL
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		std::cout << "Failed to initialize GLAD" << std::endl;
+	}
+
+	// Obtendo as informações de versão
+	const GLubyte *renderer = glGetString(GL_RENDERER); /* get renderer string */
+	const GLubyte *version = glGetString(GL_VERSION);	/* version as a string */
+	cout << "Renderer: " << renderer << endl;
+	cout << "OpenGL version supported " << version << endl;
+
+	// Definindo as dimensões da viewport com as mesmas dimensões da janela da aplicação
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
+	glViewport(0, 0, width, height);
+
+	// Compilando e buildando o programa de shader
+	GLuint shaderID = setupShader();
+
+	// Gerando um buffer simples, com a geometria de dois triângulos
+	GLuint VAO = setupGeometry();
+
+	GLint colorLoc = glGetUniformLocation(shaderID, "inputColor");
+	glUseProgram(shaderID);
+
+	// left right bottom top near far
+	mat4 projection = ortho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
+
+	GLint projLoc = glGetUniformLocation(shaderID, "projection");
+	glUniformMatrix4fv(projLoc, 1, GL_FALSE, value_ptr(projection));
+
+	///////////////////////////////////////////////////////////////////////////////////////////
+	// Matriz de modelo - Transformações na geometria (objetos)
+	mat4 model = mat4(1); // Matriz identidade (diagonal principal = 1, resto 0)
+
+	// Translação
+	model = translate(model, vec3(400.0, 300.0, 0.0)); // deslocamento x, y, z
+
+	// Rotação
+	model = rotate(model, radians(45.0f), vec3(0.0, 0.0, 1.0)); // 45 graus
+
+	// Escala
+	model = scale(model, vec3(300.0, 300.0, 1.0)); // escalamento x, y, z
+
+	// Enviar para o shader
+	GLint projLoc2 = glGetUniformLocation(shaderID, "model");
+	glUniformMatrix4fv(projLoc2, 1, GL_FALSE, value_ptr(model));
+	///////////////////////////////////////////////////////////////////////////////////////////
+
+	// Loop da aplicação - "game loop"
+	while (!glfwWindowShouldClose(window))
+	{
+		glfwPollEvents();
+
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // cor de fundo
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		glLineWidth(2);
+		glPointSize(10);
+
+		glBindVertexArray(VAO); // Conectando ao buffer de geometria
+
+		glUniform4f(colorLoc, 1.0f, 0.0f, 0.0f, 1.0f); // Cor vermelha
+
+		// Usando hora do sistema para angulos diferentes no loop
+		float angulo = glfwGetTime();
+
+		// Matriz de modelo - Transformações na geometria (objetos)
+		mat4 model = mat4(1); // Matriz identidade
+
+		// Translação
+		model = translate(model, vec3(400.0, 300.0, 0)); // x, y, z
+
+		// Rotação
+		model = rotate(model, radians(angulo * 5), vec3(0.0, 0.0, 1.0)); // 45 graus
+
+		// Escala
+		model = scale(model, vec3(300.0, 300.0, 1.0)); // x, y, z
+
+		// Enviar para o shader
+		GLint projLoc2 = glGetUniformLocation(shaderID, "model");
+		glUniformMatrix4fv(projLoc2, 1, GL_FALSE, value_ptr(model));
+
+		glDrawArrays(GL_TRIANGLES, 0, 3); // indice inicial, 3 vertices para desenhar
+
+		glBindVertexArray(0); // Desconectando o buffer de geometria
+
+		glfwSwapBuffers(window);
+	}
+
+	glDeleteVertexArrays(1, &VAO);
+	glfwTerminate();
+	return 0;
+}
+
+int loadTexture(string filePath, int &imgWidth, int &imgHeight)
+{
+	GLuint texID;
+	glGenTextures(1, &texID);
+	glBindTexture(GL_TEXTURE_2D, texID);
+
+	// Configuração do parâmetro WRAPPING nas coords s e t
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	// Configuração do parâmetro FILTERING na minificação e magnificação da textura
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// Carregamento da imagem da texture
+	int nrChannels;
+	unsigned char *data = stbi_load(filePath.c_str(), &imgWidth, &imgHeight, &nrChannels, 0);
+
+	// Carregamento da imagem da texture
+	if (data)
+	{
+		if (nrChannels == 3) // jpg, bmp
+		{
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		}
+		else // png
+		{
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imgWidth, imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		}
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		cout << "Failed to load texture: " << filePath << endl;
+	}
+
+	return texID;
+}
+
+// Função de callback de teclado
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode)
+{
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, GL_TRUE);
+}
+
+// Esta função está bastante hardcoded - objetivo é compilar e "buildar" um programa de
+//  shader simples e único neste exemplo de código
+//  O código fonte do vertex e fragment shader está nos arrays vertexShaderSource e
+//  fragmentShader source no iniçio deste arquivo
+//  A função retorna o identificador do programa de shader
+int setupShader()
+{
+	// Vertex shader
+	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+	glCompileShader(vertexShader);
+	// Checando erros de compilação (exibição via log no terminal)
+	GLint success;
+	GLchar infoLog[512];
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
+				  << infoLog << std::endl;
+	}
+	// Fragment shader
+	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+	glCompileShader(fragmentShader);
+	// Checando erros de compilação (exibição via log no terminal)
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
+				  << infoLog << std::endl;
+	}
+	// Linkando os shaders e criando o identificador do programa de shader
+	GLuint shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+	glLinkProgram(shaderProgram);
+	// Checando por erros de linkagem
+	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+	if (!success)
+	{
+		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
+				  << infoLog << std::endl;
+	}
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+
+	return shaderProgram;
+}
+
+int setupGeometry()
+{
+	// Aqui setamos as coordenadas x, y e z
+	GLfloat vertices[] = {
+		// x     y    z    r    g    b    s    t
+		// Triangle 0
+		-0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f,  // v0
+		-0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // v1
+		0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,	  // v2
+	};
+
+	GLuint VBO, VAO;
+	// Geração do identificador do VBO
+	glGenBuffers(1, &VBO);
+	// Faz a conexão (vincula) do buffer como um buffer de array
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	// Envia os dados do array de floats para o buffer da OpenGl
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	// Geração do identificador do VAO (Vertex Array Object)
+	glGenVertexArrays(1, &VAO);
+	// Vincula (bind) o VAO primeiro, e em seguida  conecta e seta o(s) buffer(s) de vértices
+	// e os ponteiros para os atributos
+	glBindVertexArray(VAO);
+
+	// Para cada atributo do vertice, criamos um "AttribPointer" (ponteiro para o atributo), indicando:
+	//  Localização no shader * (a localização dos atributos devem ser correspondentes no layout especificado no vertex shader)
+	//  Numero de valores que o atributo tem (por ex, 3 coordenadas xyz)
+	//  Tipo do dado
+	//  Se está normalizado (entre zero e um)
+	//  Tamanho em bytes
+	//  Deslocamento a partir do byte zero
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
+	glEnableVertexAttribArray(0);
+
+	// Observe que isso é permitido, a chamada para glVertexAttribPointer registrou o VBO como o objeto de buffer de vértice
+	// atualmente vinculado - para que depois possamos desvincular com segurança
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	// Desvincula o VAO (é uma boa prática desvincular qualquer buffer ou array para evitar bugs medonhos)
+	glBindVertexArray(0);
+
+	return VAO;
+}
