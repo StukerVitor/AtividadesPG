@@ -1,13 +1,13 @@
 #include <iostream>
 #include "Sprite.h"
 
-// GLAD
+// GLAD para carregamento de extensões OpenGL
 #include <glad/glad.h>
 
-// GLFW
+// GLFW para criação e gerenciamento de janelas
 #include <GLFW/glfw3.h>
 
-// GLM
+// GLM para manipulação de vetores e matrizes
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -15,153 +15,154 @@
 using namespace glm;
 using namespace std;
 
+// Construtor padrão do Sprite, inicializa variáveis e buffers
 Sprite::Sprite()
 {
-	fallSpeed = 1.0f; // Velocidade de queda padrão
+	fallSpeed = 1.0f; // Define a velocidade de queda padrão
+	VBO = 0;		  // Inicializa o VBO com 0
 }
 
+// Destrutor do Sprite, limpa recursos do OpenGL
 Sprite::~Sprite()
 {
-	// Limpar recursos
+	// Libera o VAO e VBO associados ao Sprite
 	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
 }
 
+// Método para inicializar o sprite com textura, posição, escala e ângulo
 void Sprite::inicializar(GLuint texID, vec3 pos, vec3 escala, float angulo)
 {
-	this->texID = texID;
-	this->pos = pos;
-	this->escala = escala;
-	this->angulo = angulo;
+	this->texID = texID;   // Define o identificador da textura
+	this->pos = pos;	   // Define a posição inicial
+	this->escala = escala; // Define a escala inicial
+	this->angulo = angulo; // Define o ângulo de rotação inicial
 
-	// Vertex data
+	// Dados dos vértices: posição (x, y, z) e coordenadas de textura (s, t)
 	GLfloat vertices[] = {
-		// x     y    z    r    g    b    s    t
-		// Triangle 0
-		-0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f,  // v0
-		-0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // v1
-		0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,	  // v2
-		// Triangle 1
-		-0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // v1
-		0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,  // v3
-		0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f	  // v2
+		// Triângulo 0
+		-0.5f, 0.5f, 0.0f, 0.0f, 1.0f,	// v0
+		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // v1
+		0.5f, 0.5f, 0.0f, 1.0f, 1.0f,	// v2
+		// Triângulo 1
+		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // v1
+		0.5f, -0.5f, 0.0f, 1.0f, 0.0f,	// v3
+		0.5f, 0.5f, 0.0f, 1.0f, 1.0f	// v2
 	};
 
-	GLuint VBO;
-	// Generate buffers
+	// Gera buffers para os vértices
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	// Generate VAO
+	// Gera o Vertex Array Object (VAO)
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
-	// Attribute pointers
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)0);
+	// Configura os atributos de vértice para posição e coordenadas de textura
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
 
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(2);
-
-	// Unbind buffers
+	// Desvincula os buffers para evitar modificações acidentais
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
 
+// Retorna a posição X do sprite
 float Sprite::GetXPos()
 {
 	return pos.x;
 }
 
+// Retorna a posição Y do sprite
 float Sprite::GetYPos()
 {
 	return pos.y;
 }
 
+// Método para desenhar o sprite na tela
 void Sprite::desenhar()
 {
-	// Update transformations and send to shader
+	// Atualiza a matriz de transformação e envia para o shader
 	atualizar();
 
-	// Activate shader program
+	// Ativa o programa de shader
 	glUseProgram(shaderID);
 
-	// Bind texture
+	// Vincula a textura associada ao sprite
 	glBindTexture(GL_TEXTURE_2D, texID);
 	glBindVertexArray(VAO);
 
-	// Draw sprite
+	// Desenha o sprite utilizando os vértices configurados
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	// Unbind texture and VAO
+	// Desvincula a textura e o VAO
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindVertexArray(0);
 }
 
+// Movimenta o sprite para a direita com o deslocamento especificado
 void Sprite::moveRight(float offset)
 {
-	if (pos.x >= 800)
+	if (pos.x >= 800) // Se o sprite ultrapassar a borda direita da tela
 	{
-		pos.x = 1;
+		pos.x = 1; // Reposiciona no início da tela
 	}
 	else
-		pos.x += offset;
+		pos.x += offset; // Move para a direita
 }
 
+// Movimenta o sprite para a esquerda com o deslocamento especificado
 void Sprite::moveLeft(float offset)
 {
-	if (pos.x <= 0)
+	if (pos.x <= 0) // Se o sprite ultrapassar a borda esquerda da tela
 	{
-		pos.x = 799;
+		pos.x = 799; // Reposiciona no final da tela
 	}
 	else
-		pos.x -= offset;
+		pos.x -= offset; // Move para a esquerda
 }
 
-void Sprite::cair(bool x)
+// Aplica movimento de queda ao sprite e redefine se necessário
+void Sprite::cair(bool reset)
 {
-	if (pos.y < 100 || x)
+	if (pos.y < 100 || reset) // Se o sprite estiver abaixo do limite ou resetar
 	{
-		pos.x = 10.0f + static_cast<float>(rand() % 781);
-		pos.y = 1000.0f;
+		pos.x = 10.0f + static_cast<float>(rand() % 781); // Reposiciona em X aleatoriamente
+		pos.y = 1000.0f;								  // Reposiciona no topo da tela
 	}
 	else
 	{
-		pos.y -= fallSpeed; // Usar a velocidade de queda definida
+		pos.y -= fallSpeed; // Move para baixo usando a velocidade de queda
 	}
 }
 
+// Atualiza a matriz de transformação do sprite e envia para o shader
 void Sprite::atualizar()
 {
-	// Create model matrix and apply transformations
-	mat4 model = mat4(1.0f); // Identity matrix
-	model = translate(model, pos);
-	model = rotate(model, radians(angulo), vec3(0.0f, 0.0f, 1.0f));
-	model = scale(model, escala);
+	mat4 model = mat4(1.0f);										// Cria a matriz de modelo como identidade
+	model = translate(model, pos);									// Aplica translação
+	model = rotate(model, radians(angulo), vec3(0.0f, 0.0f, 1.0f)); // Aplica rotação
+	model = scale(model, escala);									// Aplica escala
 
-	// Activate shader program
+	// Ativa o shader
 	glUseProgram(shaderID);
 
-	// Send 'model' matrix to shader
+	// Envia a matriz de modelo para o shader
 	GLint modelLoc = glGetUniformLocation(shaderID, "model");
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, value_ptr(model));
 }
 
+// Troca a textura do sprite
 void Sprite::switchSide(GLuint texID_Ref)
 {
 	texID = texID_Ref;
 }
 
-void Sprite::finalizar()
-{
-	// Clean up resources
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteProgram(shaderID);
-}
-
+// Define a velocidade de queda do sprite
 void Sprite::setFallSpeed(float speed)
 {
 	fallSpeed = speed;
