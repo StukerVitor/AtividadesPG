@@ -146,6 +146,7 @@ int main()
 	// Carrega as texturas utilizadas no jogo a partir dos arquivos
 	GLuint texID_backGround = loadTexture("../Textures/PixelArt/BackGround/nature_5/orig.png");
 	GLuint texID_espada_1 = loadTexture("../Textures/craftpix/PNG/Transperent/Icon5.png");
+	GLuint texID_espada_2 = loadTexture("../Textures/craftpix/PNG/Transperent/Icon17.png");
 	GLuint texID_gameOver = loadTexture("../Textures/gameOver/gameOver.png");
 	GLuint texID_vitoria = loadTexture("../Textures/gameOver/vitoria.png");
 	GLuint texID_coelhoR = loadTexture("../Textures/Coelho/coelhoRight.png");
@@ -170,7 +171,7 @@ int main()
 
 	Sprite espada_2; // Sprite para a espada 2
 	espada_2.setShader(shaderID);
-	espada_2.inicializar(texID_espada_1, vec3(600.0f, 1080.0f, 0.0f), vec3(32.0f, 32.0f, 1.0f));
+	espada_2.inicializar(texID_espada_2, vec3(600.0f, 1080.0f, 0.0f), vec3(32.0f, 32.0f, 1.0f));
 
 	Sprite cenoura; // Sprite para a cenoura
 	cenoura.setShader(shaderID);
