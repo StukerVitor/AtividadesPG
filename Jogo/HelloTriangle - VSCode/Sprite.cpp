@@ -129,14 +129,41 @@ void Sprite::moveLeft(float offset)
 // Aplica movimento de queda ao sprite e redefine se necessário
 void Sprite::cair(bool reset)
 {
-	if (pos.y < 100 || reset) // Se o sprite estiver abaixo do limite ou resetar
+	static bool rotateRight = true;		   // Direção inicial de rotação
+	static float rotationSpeed = 2.0f;	   // Velocidade de rotação
+	static float maxRotationAngle = 30.0f; // Ângulo máximo para rotação
+
+	// Se o sprite estiver abaixo do limite ou precisar ser resetado
+	if (pos.y < 100 || reset)
 	{
 		pos.x = 10.0f + static_cast<float>(rand() % 781); // Reposiciona em X aleatoriamente
 		pos.y = 1000.0f;								  // Reposiciona no topo da tela
+		angulo = 0.0f;									  // Reseta o ângulo de rotação
 	}
 	else
 	{
-		pos.y -= fallSpeed; // Move para baixo usando a velocidade de queda
+		// Movimento de queda
+		pos.y -= fallSpeed;
+
+		// Animação de rotação enquanto cai
+		if (rotateRight)
+		{
+			angulo += rotationSpeed * 0.016f; // Incrementa o ângulo se estiver rotacionando para a direita
+			if (angulo > maxRotationAngle)
+			{
+				angulo = maxRotationAngle; // Limita o ângulo para não passar do máximo
+				rotateRight = false;	   // Muda a direção para a esquerda
+			}
+		}
+		else
+		{
+			angulo -= rotationSpeed * 0.016f; // Decrementa o ângulo se estiver rotacionando para a esquerda
+			if (angulo < -maxRotationAngle)
+			{
+				angulo = -maxRotationAngle; // Limita o ângulo para não passar do mínimo
+				rotateRight = true;			// Muda a direção para a direita
+			}
+		}
 	}
 }
 
