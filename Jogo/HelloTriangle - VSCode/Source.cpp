@@ -180,6 +180,7 @@ int main()
 	// Configura e inicializa o sprite do coelho
 	coelho.setShader(shaderID);
 	coelho.inicializar(texID_coelhoR, vec3(300.0f, 120.0f, 0.0f), vec3(65.0f, 70.0f, 1.0f));
+
 	// Sprite para a tela de Game Over
 	Sprite gameOver;
 	gameOver.setShader(shaderID);

@@ -48,68 +48,172 @@ Certifique-se de que as bibliotecas necessárias estejam corretamente instaladas
 
 ## 🔄 Fluxo de Execução do Jogo
 
-A execução do jogo Rabbit Game segue um fluxo estruturado que pode ser dividido em várias etapas:
+A execução do jogo Rabbit Game segue um fluxo estruturado que pode ser dividido em várias etapas, desde a inicialização dos componentes até a renderização dos elementos na tela e a atualização contínua do estado do jogo.
 
-### Inicialização do Ambiente e Configuração de Janelas
+### 1. Inicialização do Ambiente e Configuração de Janelas
 
-- A biblioteca GLFW é inicializada para criar a janela principal e gerenciar eventos de entrada.
-- Em seguida, é criado um contexto OpenGL para essa janela.
-- A biblioteca GLAD é usada para carregar as funções OpenGL necessárias.
-- O jogo então configura funções de callback para eventos de teclado e mouse, como `key_callback` e `mouse_button_callback`.
-- Os parâmetros do OpenGL são ajustados para habilitar recursos como transparência (blending) e definir a matriz de projeção ortográfica para renderizar sprites em 2D.
+### Inicialização do GLFW
 
-### Carregamento de Texturas
+O jogo começa inicializando a biblioteca GLFW com `glfwInit()`, que é essencial para criar janelas e contextos OpenGL.
 
-O jogo utiliza a biblioteca STB Image para carregar texturas a partir de arquivos de imagem, que são aplicadas aos diferentes sprites do jogo. As texturas são carregadas com a função `loadTexture`, que gera um identificador para cada imagem e a configura como textura 2D:
+### Criação da Janela Principal
 
-- **Texturas de Cenoura, Espadas, Coelho (direita/esquerda), Botões (`start`, `play again`, `exit`) e Telas de `Game Over` e `Vitória`**.
-- Essas texturas são então vinculadas a diferentes sprites e armazenadas para uso posterior.
+Uma janela principal é criada usando `glfwCreateWindow()` com as dimensões definidas (800x600) e um título personalizado `"##### Rabbit Game #####"`.
 
-### Criação de Sprites
+### Configuração do Contexto OpenGL
 
-Com as texturas carregadas, o programa inicializa diferentes instâncias da classe `Sprite`, definindo a posição, escala e rotação de cada objeto. Cada sprite representa um elemento na tela, como:
+O contexto OpenGL é associado à janela recém-criada usando `glfwMakeContextCurrent(window)`.
 
-- `coelho` (personagem principal)
-- `espada_1` e `espada_2` (obstáculos)
-- `cenoura` (objetivo de coleta)
-- `background`, `gameOver`, `vitoria`, `placar` e botões de controle.
+### Carregamento de Extensões OpenGL com GLAD
 
-Cada sprite é configurado com sua textura correspondente e é preparado para ser desenhado na tela durante a execução do jogo.
+A biblioteca GLAD é inicializada com `gladLoadGLLoader()` para carregar todas as funções OpenGL necessárias para renderização.
 
-### Loop Principal do Jogo
+### Configuração de Callbacks
 
-Após a configuração inicial, o jogo entra no loop principal, onde os seguintes passos são executados repetidamente:
+Funções de callback são registradas para gerenciar eventos de entrada:
 
-1. **Verificação de Eventos de Entrada**:  
-   A cada iteração, o jogo verifica se algum evento de entrada (como um clique de mouse ou uma tecla pressionada) foi acionado e atualiza o estado do jogo de acordo.
+- `glfwSetKeyCallback(window, key_callback)`: Para eventos de teclado.
+- `glfwSetMouseButtonCallback(window, mouse_button_callback)`: Para eventos de mouse.
 
-2. **Controle de Estados do Jogo**:  
-   O fluxo principal depende do valor da variável `gameState`, que pode assumir os seguintes estados:
+### Configuração de Parâmetros OpenGL
 
-   - `gameState == 0`: **Menu Inicial** – Exibe o fundo e o botão de início.
-   - `gameState == 1`: **Jogo em Andamento** – O jogador controla o coelho para coletar cenouras e desviar das espadas.
-   - `gameState == 2`: **Tela de Game Over** – Exibe a tela de Game Over e oferece opções para reiniciar ou sair.
-   - `gameState == 3`: **Tela de Vitória** – Exibe a tela de vitória com as mesmas opções.
+- **Teste de Profundidade**: Habilitado com `glEnable(GL_DEPTH_TEST)` e configurado com `glDepthFunc(GL_ALWAYS)`.
+- **Blending (Transparência)**: Habilitado com `glEnable(GL_BLEND)` e configurado com `glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)` para permitir transparência nas texturas.
 
-3. **Renderização**:  
-   O OpenGL é utilizado para renderizar cada sprite na tela com base em suas propriedades de transformação (posição, escala e rotação).  
-   A função `desenhar()` de cada sprite é chamada para enviar os dados ao pipeline gráfico e desenhar o objeto na tela.
+### Configuração dos Shaders
 
-4. **Lógica de Jogo**:  
-   A cada frame, o estado do jogo é atualizado, verificando se o jogador atingiu a pontuação máxima ou se colidiu com algum obstáculo.
+Os shaders são compilados e configurados usando a função `setupShader()`, que retorna o identificador do programa de shader (`shaderID`). O shader é então ativado com `glUseProgram(shaderID)`.
 
-   - As posições dos sprites (espadas e cenoura) são atualizadas com base em suas velocidades de queda.
-   - As colisões são verificadas usando a função `colisao()` para determinar se o coelho entrou em contato com uma espada ou uma cenoura.
+### Configuração da Matriz de Projeção Ortográfica
 
-5. **Atualização e Renderização de Estado**:  
-   Dependendo do estado atual (`gameState`), o jogo exibe diferentes elementos na tela e realiza transições de estado (por exemplo, de Menu para Jogo ou de Jogo para Game Over).
+Uma matriz de projeção ortográfica é criada usando `ortho()` para renderizar objetos 2D, e é enviada ao shader com `glUniformMatrix4fv()`.
 
-6. **Troca de Buffers**:  
-   A cada iteração do loop, os buffers são trocados (`glfwSwapBuffers`) para atualizar a tela com as novas posições e estados dos objetos.
+### 2. Carregamento de Texturas
 
-### Finalização
+### Configuração da Biblioteca STB Image
 
-Quando a janela é fechada ou o jogo é encerrado, o programa libera todos os recursos e encerra a execução corretamente, chamando `glfwTerminate()`.
+A biblioteca STB Image é configurada para inverter as imagens carregadas verticalmente com `stbi_set_flip_vertically_on_load(true)`, garantindo que as texturas sejam mapeadas corretamente.
+
+### Carregamento de Imagens
+
+As texturas são carregadas a partir dos arquivos de imagem correspondentes usando a função `loadTexture()`:
+
+- **Cenoura**: `../Textures/Cenoura/cenoura.png`
+- **Coelho (direita e esquerda)**: `../Textures/Coelho/coelhoRight.png` e `../Textures/Coelho/coelhoLeft.png`
+- **Espadas**: `../Textures/craftpix/PNG/Transperent/Icon5.png` e `Icon17.png`
+- **Background**: `../Textures/PixelArt/BackGround/nature_5/orig.png`
+- **Placar (números de 0 a 3)**: `../Textures/Placar/0.png` a `3.png`
+- **Botões**: `../Textures/Botoes/start.png`, `playAgain.png`, `exit.png`
+- **Telas de Game Over e Vitória**: `../Textures/gameOver/gameOver.png`, `vitoria.png`
+
+### Armazenamento dos Identificadores de Textura
+
+Cada chamada a `loadTexture()` retorna um identificador de textura (`GLuint`), que é armazenado em variáveis para uso posterior na criação dos sprites.
+
+### 3. Criação e Configuração de Sprites
+
+### Instanciação de Sprites
+
+São criadas instâncias da classe `Sprite` para cada elemento do jogo:
+
+- **Personagem Principal**: `coelho`
+- **Obstáculos**: `espada_1` e `espada_2`
+- **Objetivo**: `cenoura`
+- **Elementos de Interface**: `background`, `gameOver`, `vitoria`, `placar`, `placarZero`, `placarUm`, `placarDois`, `placarTres`
+- **Botões**: `startButton`, `playAgainButton`, `exitButton`
+
+### Configuração dos Sprites
+
+- **Shader Associado**: Cada sprite tem o shader configurado com `setShader(shaderID)`.
+- **Inicialização**: Os sprites são inicializados com `inicializar(texID, posição, escala, ângulo)`:
+  - Exemplo: `coelho.inicializar(texID_coelhoR, vec3(300.0f, 120.0f, 0.0f), vec3(65.0f, 70.0f, 1.0f))`
+- **Velocidade de Queda**: Para sprites que caem (espadas e cenoura), a velocidade de queda é definida com `setFallSpeed(valor)`.
+
+### Configuração Específica de Sprites
+
+- **Coelho**: Inicia na posição `(300.0f, 120.0f)` com textura `coelhoRight`.
+- **Espadas**: Iniciam acima da tela e caem em direção ao coelho.
+- **Cenoura**: Também cai do topo da tela e deve ser coletada pelo coelho.
+- **Placar**: Exibe a pontuação atual do jogador, atualizando a textura conforme o jogador coleta cenouras.
+
+### 4. Loop Principal do Jogo
+
+O loop principal é responsável por atualizar o estado do jogo, processar entradas e renderizar os sprites. Este loop continua até que a janela seja fechada.
+
+### 4.1. Processamento de Eventos
+
+- **Entrada de Usuário**: Eventos de teclado e mouse são processados com `glfwPollEvents()`.
+- **Movimento do Coelho**: Verifica se as teclas `D` ou `Seta Direita` e `A` ou `Seta Esquerda` estão pressionadas para mover o coelho.
+- **Atualização da Textura do Coelho**: Dependendo da direção do movimento, a textura do coelho é atualizada para `coelhoRight` ou `coelhoLeft` usando `coelho.switchSide(texID_coelhoR)`.
+
+### 4.2. Atualização de Estados e Lógica de Jogo
+
+#### Controle de Estados (`gameState`):
+
+- **0 - Menu Inicial**:
+  - Exibe o fundo e o botão "Start".
+  - Aguarda o clique do usuário no botão "Start" para iniciar o jogo.
+- **1 - Jogo em Andamento**:
+  - O coelho pode ser movido pelo jogador.
+  - As espadas e a cenoura caem em direção ao coelho.
+  - Verifica colisões:
+    - **Colisão com Cenoura**:
+      - Incrementa a pontuação (`pontos++`).
+      - Atualiza o placar exibido.
+      - Verifica se o jogador alcançou a pontuação necessária para vencer (`pontos >= quantPont`).
+    - **Colisão com Espadas**:
+      - Define o estado de Game Over (`gmOver = 1`).
+      - Transita para o estado de Game Over (`gameState = 2`).
+- **2 - Tela de Game Over**:
+  - Exibe a tela de Game Over e os botões "Play Again" e "Exit".
+  - Aguarda a interação do usuário para reiniciar o jogo ou sair.
+- **3 - Tela de Vitória**:
+  - Exibe a tela de Vitória e os botões "Play Again" e "Exit".
+  - Aguarda a interação do usuário para reiniciar o jogo ou sair.
+
+#### Movimento dos Sprites
+
+- **Espadas e Cenoura**: Atualizam suas posições chamando `cair(false)`, fazendo com que caiam continuamente.
+- **Coelho**: Movido pelo usuário através das entradas de teclado.
+
+#### Verificação de Colisões
+
+- A função `colisao()` é utilizada para detectar colisões entre o coelho e as espadas ou cenoura.
+- **Colisão com Cenoura**:
+  - A cenoura é reposicionada para cair novamente.
+- **Colisão com Espadas**:
+  - O jogo é interrompido e transita para a tela de Game Over.
+
+### 4.3. Renderização
+
+- **Limpeza da Tela**: Limpa o buffer de cor com `glClear(GL_COLOR_BUFFER_BIT)`.
+
+- **Renderização dos Sprites**:
+
+  - **Menu Inicial**:
+    - Desenha o `background` e o `startButton`.
+  - **Jogo em Andamento**:
+    - Desenha o `background`, `espada_1`, `espada_2`, `cenoura`, `placar` e o `coelho`.
+  - **Tela de Game Over**:
+    - Desenha o `background`, `gameOver`, `playAgainButton` e `exitButton`.
+  - **Tela de Vitória**:
+    - Desenha o `background`, `vitoria`, `playAgainButton` e `exitButton`.
+
+- **Troca de Buffers**: Os buffers são trocados com `glfwSwapBuffers(window)` para atualizar a tela com as renderizações do frame atual.
+
+### 5. Finalização
+
+### Encerramento do Jogo
+
+Quando o usuário fecha a janela ou seleciona "Exit", o loop principal é interrompido.
+
+### Liberação de Recursos
+
+- **Terminação do GLFW**: `glfwTerminate()` é chamado para finalizar a biblioteca GLFW e liberar recursos alocados.
+
+### Retorno da Função Principal
+
+O programa retorna `0` indicando que foi encerrado com sucesso.
 
 ## 🎮 Como Jogar
 
