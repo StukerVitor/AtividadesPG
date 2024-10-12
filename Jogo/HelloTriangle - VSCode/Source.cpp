@@ -362,6 +362,7 @@ int main()
 	glfwTerminate();
 	return 0;
 }
+
 // Função para verificar se o botão foi clicado com base nas coordenadas do mouse
 bool isButtonClicked(double mouseX, double mouseY, Sprite &button)
 {
