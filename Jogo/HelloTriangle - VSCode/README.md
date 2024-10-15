@@ -9,8 +9,6 @@ Rabbit Game é um jogo 2D simples desenvolvido usando OpenGL e C++, onde o objet
 - [Como Jogar](#como-jogar)
 - [Controles](#controles)
 - [Estrutura do Código](#estrutura-do-código)
-- [Shaders](#shaders)
-- [Texturas Utilizadas](#texturas-utilizadas)
 - [Detalhes Técnicos](#detalhes-técnicos)
 - [Créditos](#créditos)
 
