@@ -2,6 +2,11 @@
 
 Rabbit Game é um jogo 2D simples desenvolvido usando OpenGL e C++, onde o objetivo é controlar um coelho para coletar cenouras e evitar espadas que caem do céu. O projeto foi criado para demonstrar conceitos básicos de manipulação de sprites, renderização 2D, transformações de objetos e interações com o usuário utilizando OpenGL.
 
+## Links Gravação:
+
+- https://www.youtube.com/watch?v=kfp1l2S9rFo
+- https://www.youtube.com/watch?v=9q1cnj7DtOM
+
 ## 📜 Sumário
 
 - [Instalação](#instalação)
