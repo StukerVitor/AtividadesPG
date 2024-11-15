@@ -2,15 +2,34 @@ import cv2
 import numpy as np
 # Dicionário para mapear teclas aos filtros
 filters = {
+    # Filtro de Detecção de Bordas Canny: 'frame' é a imagem de entrada, '50' é o limite inferior e '100' é o limite superior para detecção de bordas.
     ord('c'): {'active': False, 'function': lambda frame: cv2.Canny(frame, 50, 100)},
+    
+    # Filtro de Desfoque Gaussiano: 'frame' é a imagem de entrada, '(15, 15)' define o tamanho do kernel (largura e altura), e '0' é o desvio padrão no eixo X e Y.
     ord('b'): {'active': False, 'function': lambda frame: cv2.GaussianBlur(frame, (15, 15), 0)},
+    
+    # Aplica filtro magenta customizado, definindo tons magenta na imagem.
     ord('m'): {'active': False, 'function': lambda frame: apply_magenta(frame)},
+    
+    # Filtro Sobel: 'frame' é a imagem de entrada, 'cv2.CV_64F' define o tipo de profundidade de saída, '1' e '0' especificam a derivada no eixo X e não no Y, 'ksize=5' é o tamanho do kernel.
     ord('s'): {'active': False, 'function': lambda frame: cv2.Sobel(frame, cv2.CV_64F, 1, 0, ksize=5)},
+    
+    # Filtro Laplaciano: 'frame' é a imagem de entrada, 'cv2.CV_64F' define a profundidade de saída para capturar bordas e contrastes em múltiplas direções.
     ord('l'): {'active': False, 'function': lambda frame: cv2.Laplacian(frame, cv2.CV_64F)},
+    
+    # Equalização de Histograma: 'frame' é a imagem de entrada convertida para tons de cinza, melhorando o contraste pela redistribuição dos valores de pixel.
     ord('h'): {'active': False, 'function': lambda frame: cv2.equalizeHist(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY))},
+    
+    # Filtro de Binarização (Threshold): 'frame' é a imagem de entrada convertida para tons de cinza, '127' é o valor limite, '255' é o valor máximo, e 'cv2.THRESH_BINARY' cria uma imagem binária.
     ord('t'): {'active': False, 'function': lambda frame: cv2.threshold(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), 127, 255, cv2.THRESH_BINARY)[1]},
+    
+    # Erosão: 'frame' é a imagem de entrada, 'np.ones((5, 5), np.uint8)' cria o kernel de erosão (tamanho 5x5), 'iterations=1' define o número de vezes que a erosão é aplicada.
     ord('e'): {'active': False, 'function': lambda frame: cv2.erode(frame, np.ones((5, 5), np.uint8), iterations=1)},
+    
+    # Dilatação: 'frame' é a imagem de entrada, 'np.ones((5, 5), np.uint8)' cria o kernel de dilatação (tamanho 5x5), 'iterations=1' define o número de vezes que a dilatação é aplicada.
     ord('d'): {'active': False, 'function': lambda frame: cv2.dilate(frame, np.ones((5, 5), np.uint8), iterations=1)},
+    
+    # Inversão de Cores: 'frame' é a imagem de entrada, invertendo as cores, ou seja, cada valor de pixel é subtraído de 255.
     ord('n'): {'active': False, 'function': lambda frame: cv2.bitwise_not(frame)}
 }
 
