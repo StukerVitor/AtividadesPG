@@ -1,5 +1,5 @@
-Nome: Vitor Stüker de Almeida
-Link apresentação: https://www.youtube.com/watch?v=xHYw-K3d3DI
+- Nome: Vitor Stüker de Almeida
+- Link apresentação: https://www.youtube.com/watch?v=xHYw-K3d3DI
 
 # Explicação Completa do Código
 
