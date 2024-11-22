@@ -1,3 +1,6 @@
+Nome: Vitor Stüker de Almeida
+Link apresentação: https://www.youtube.com/watch?v=xHYw-K3d3DI
+
 # Explicação Completa do Código
 
 Este documento fornece uma explicação detalhada do código fornecido, que é um aplicativo em Python utilizando a biblioteca OpenCV para aplicar filtros e stickers (adesivos) em imagens e vídeos capturados pela webcam. O programa permite que o usuário interaja em tempo real com a imagem, aplicando diferentes efeitos visuais e adicionando stickers em posições específicas.
